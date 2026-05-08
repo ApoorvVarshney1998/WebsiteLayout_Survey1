@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whispering Pines - Camping Experience Research</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pine-dark: #1a3a3a;
+            --pine-medium: #2d5f5f;
+            --pine-light: #4a9d9d;
+            --cream: #f5f3f0;
+            --accent: #c97b5c;
+            --accent-light: #e8b5a0;
+            --text-dark: #2c2c2c;
+            --text-light: #666;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Georgia', 'Garamond', serif;
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8f5f5 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(26, 58, 58, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--pine-dark) 0%, var(--pine-medium) 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .progress-container {
+            padding: 20px 30px;
+            background: #fafafa;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--pine-light) 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-wrapper {
+            padding: 40px 30px;
+            min-height: 400px;
+        }
+
+        .form-page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-number {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--text-light);
+            font-style: italic;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-dark);
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .form-group label:hover {
+            background: #f9f9f9;
+            border-color: var(--pine-light);
+        }
+
+        .form-group input[type="radio"],
+        .form-group input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            color: var(--text-dark);
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--pine-light);
+            box-shadow: 0 0 0 3px rgba(74, 157, 157, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-prev {
+            background: white;
+            color: var(--pine-dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-prev:hover {
+            background: #f5f5f5;
+            border-color: var(--pine-light);
+        }
+
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, var(--accent) 0%, #d4885c 100%);
+            color: white;
+        }
+
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(201, 123, 92, 0.3);
+        }
+
+        .btn-prev:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .thank-you {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .thank-you h2 {
+            color: var(--pine-dark);
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .thank-you p {
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .success-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .note {
+            background: #f0f8f8;
+            border-left: 4px solid var(--pine-light);
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 600px) {
+            .form-wrapper {
+                padding: 25px 20px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏕️ Whispering Pines</h1>
+            <p>Camping & Family Retreat Experience Research</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text"><span id="currentPage">1</span> of <span id="totalPages">12</span></div>
+        </div>
+
+        <form id="researchForm">
+            <div class="form-wrapper">
+                <!-- INTRO PAGE -->
+                <div class="form-page active">
+                    <div style="text-align: center; padding: 40px 0;">
+                        <h2 style="color: var(--pine-dark); margin-bottom: 20px; font-size: 24px; font-weight: 400;">Welcome!</h2>
+                        <p style="color: var(--text-light); margin-bottom: 20px; font-size: 15px; line-height: 1.8;">
+                            This research explores how families and groups discover and decide to book camping experiences. Your honest feedback will help us design a better experience for people like you planning getaways.
+                        </p>
+                        <div style="background: #f0f8f8; padding: 20px; border-radius: 8px; margin: 25px 0; font-size: 14px; color: var(--text-dark);">
+                            <strong>Time Required:</strong> 8-10 minutes<br>
+                            <strong>Privacy:</strong> Your responses are confidential
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 1: DISCOVERY -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 1 OF 12</div>
+                    <p class="subtitle">How you find camping sites</p>
+                    <div class="question-text">When searching for a camping site, how much time do you typically spend on the first website before deciding to look elsewhere or book?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q1" value="Less than 5 minutes"> Less than 5 minutes</label>
+                        <label><input type="radio" name="q1" value="5-15 minutes"> 5-15 minutes</label>
+                        <label><input type="radio" name="q1" value="15-30 minutes"> 15-30 minutes</label>
+                        <label><input type="radio" name="q1" value="More than 30 minutes"> More than 30 minutes</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 1.2 -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 1 OF 12</div>
+                    <p class="subtitle">How you find camping sites</p>
+                    <div class="question-text">What usually makes you leave a camping site's website without booking?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q2" value="Not enough photos"> Not enough photos of the site</label>
+                        <label><input type="checkbox" name="q2" value="Prices unclear"> Pricing wasn't clear</label>
+                        <label><input type="checkbox" name="q2" value="Dates not available"> Dates I wanted weren't available</label>
+                        <label><input type="checkbox" name="q2" value="Website confusing"> Website was confusing/hard to navigate</label>
+                        <label><input type="checkbox" name="q2" value="No reviews"> No customer reviews or ratings</label>
+                        <label><input type="checkbox" name="q2" value="Couldn't find info"> Couldn't find specific information I needed</label>
+                        <label><input type="checkbox" name="q2" value="Booking too complicated"> Booking process looked too complicated</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 1.3 -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 1 OF 12</div>
+                    <p class="subtitle">How you find camping sites</p>
+                    <div class="question-text">When browsing a camping site's website, what are the first three things you check?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q3" value="Photos of the site"> Photos of the site</label>
+                        <label><input type="checkbox" name="q3" value="Price"> Price</label>
+                        <label><input type="checkbox" name="q3" value="Available dates"> Available dates</label>
+                        <label><input type="checkbox" name="q3" value="Facilities & amenities"> Facilities & amenities</label>
+                        <label><input type="checkbox" name="q3" value="Customer reviews"> Customer reviews</label>
+                        <label><input type="checkbox" name="q3" value="Location & how to reach"> Location & how to reach</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: COMFORT -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 2 OF 12</div>
+                    <p class="subtitle">Comfort & facilities</p>
+                    <div class="question-text">What facilities matter most to you when choosing a camping site?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q4" value="Clean bathrooms"> Clean bathrooms</label>
+                        <label><input type="checkbox" name="q4" value="Running water"> Running water</label>
+                        <label><input type="checkbox" name="q4" value="Electricity"> Electricity</label>
+                        <label><input type="checkbox" name="q4" value="Cooking area"> Cooking area</label>
+                        <label><input type="checkbox" name="q4" value="Seating/bonfire area"> Seating/bonfire area</label>
+                        <label><input type="checkbox" name="q4" value="Wi-Fi"> Wi-Fi</label>
+                        <label><input type="checkbox" name="q4" value="Medical facilities"> Medical facilities nearby</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 2.2 -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 2 OF 12</div>
+                    <p class="subtitle">Comfort & facilities</p>
+                    <div class="question-text">Have poor photos or unclear descriptions of bathrooms/tents made you hesitant about a camping site?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q5" value="Yes, very hesitant"> Yes, very hesitant</label>
+                        <label><input type="radio" name="q5" value="Somewhat"> Somewhat</label>
+                        <label><input type="radio" name="q5" value="Not really"> Not really</label>
+                        <label><input type="radio" name="q5" value="I always call to ask"> I always call to ask</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: FAMILY-FRIENDLINESS -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 3 OF 12</div>
+                    <p class="subtitle">Family & group suitability</p>
+                    <div class="question-text">When bringing young children or elderly family members camping, what information on a website makes you feel confident?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q6" value="Safety rules"> Safety rules</label>
+                        <label><input type="checkbox" name="q6" value="Activities for different ages"> Activities for different ages</label>
+                        <label><input type="checkbox" name="q6" value="Medical emergency procedures"> Medical emergency procedures</label>
+                        <label><input type="checkbox" name="q6" value="Accessibility for elderly"> Accessibility for elderly</label>
+                        <label><input type="checkbox" name="q6" value="Staff & supervision"> Staff & supervision details</label>
+                        <label><input type="checkbox" name="q6" value="Other families' experiences"> Other families' reviews</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: ACTIVITIES -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 4 OF 12</div>
+                    <p class="subtitle">Activities & entertainment</p>
+                    <div class="question-text">How important are activities for different age groups when choosing a camping site?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q7" value="Extremely important"> Extremely important</label>
+                        <label><input type="radio" name="q7" value="Very important"> Very important</label>
+                        <label><input type="radio" name="q7" value="Somewhat important"> Somewhat important</label>
+                        <label><input type="radio" name="q7" value="Not important"> Not important</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: PRICING -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 5 OF 12</div>
+                    <p class="subtitle">Pricing & value for money</p>
+                    <div class="question-text">When you see the price, what helps you feel it's worth the money?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q8" value="Clear breakdown of what's included"> Clear breakdown of what's included</label>
+                        <label><input type="checkbox" name="q8" value="Meals included"> Meals included</label>
+                        <label><input type="checkbox" name="q8" value="Activities listed"> Activities listed</label>
+                        <label><input type="checkbox" name="q8" value="Quality tent/accommodation"> Quality tent/accommodation details</label>
+                        <label><input type="checkbox" name="q8" value="Comparison with similar sites"> Comparison pricing</label>
+                        <label><input type="checkbox" name="q8" value="Discounts for groups/families"> Discounts for groups/families</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 5.2 -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 5 OF 12</div>
+                    <p class="subtitle">Pricing & value for money</p>
+                    <div class="question-text">Have unclear pricing made you leave a camping site's website?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q9" value="Yes, immediately"> Yes, I left immediately</label>
+                        <label><input type="radio" name="q9" value="Yes, I contacted them"> Yes, I contacted them instead of booking online</label>
+                        <label><input type="radio" name="q9" value="No, I figured it out"> No, I figured it out</label>
+                        <label><input type="radio" name="q9" value="No, clear pricing"> Clear pricing on the site</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: BOOKING -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 6 OF 12</div>
+                    <p class="subtitle">Booking flexibility & logistics</p>
+                    <div class="question-text">What flexibility matters most when booking a camping trip?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q10" value="Easy to change group size"> Easy to change group size</label>
+                        <label><input type="checkbox" name="q10" value="Simple cancellation policy"> Simple cancellation policy</label>
+                        <label><input type="checkbox" name="q10" value="Multiple payment options"> Multiple payment options</label>
+                        <label><input type="checkbox" name="q10" value="Bring your own tent option"> Bring your own tent option</label>
+                        <label><input type="checkbox" name="q10" value="Quick online booking"> Quick online booking (no forms)</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 7: FOOD -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 7 OF 12</div>
+                    <p class="subtitle">Food & dietary requirements</p>
+                    <div class="question-text">How important is food information when choosing a camping site?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q11" value="Very important"> Very important</label>
+                        <label><input type="radio" name="q11" value="Important"> Important</label>
+                        <label><input type="radio" name="q11" value="Somewhat important"> Somewhat important</label>
+                        <label><input type="radio" name="q11" value="Not important"> Not important</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 8: LOCATION -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 8 OF 12</div>
+                    <p class="subtitle">Location & accessibility</p>
+                    <div class="question-text">Which location details matter most to you?</div>
+                    <div class="form-group">
+                        <label><input type="checkbox" name="q12" value="Distance from my city"> Distance from my city</label>
+                        <label><input type="checkbox" name="q12" value="Driving directions"> Clear directions to reach</label>
+                        <label><input type="checkbox" name="q12" value="Parking availability"> Parking availability</label>
+                        <label><input type="checkbox" name="q12" value="Map of the site"> Map of the site layout</label>
+                        <label><input type="checkbox" name="q12" value="Accessibility for elderly/disabled"> Accessibility for elderly/disabled</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 9: TIMING -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 9 OF 12</div>
+                    <p class="subtitle">Booking timing & availability</p>
+                    <div class="question-text">When do you typically book camping trips?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q13" value="Weekends (spontaneous)"> Weekends (spontaneous)</label>
+                        <label><input type="radio" name="q13" value="1-2 weeks in advance"> 1-2 weeks in advance</label>
+                        <label><input type="radio" name="q13" value="1-3 months in advance"> 1-3 months in advance</label>
+                        <label><input type="radio" name="q13" value="Seasonal/planned vacations"> Seasonal/planned vacations</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 10: REVIEWS -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 10 OF 12</div>
+                    <p class="subtitle">Reviews & trust</p>
+                    <div class="question-text">Do customer reviews from families influence your booking decision?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q14" value="Yes, very much"> Yes, very much</label>
+                        <label><input type="radio" name="q14" value="Somewhat"> Somewhat</label>
+                        <label><input type="radio" name="q14" value="Not really"> Not really</label>
+                        <label><input type="radio" name="q14" value="I don't read reviews"> I don't read reviews</label>
+                    </div>
+                </div>
+
+                <!-- SECTION 11: FINAL QUESTION -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 11 OF 12</div>
+                    <p class="subtitle">The biggest hesitation</p>
+                    <div class="question-text">If you could change ONE thing about camping websites to make you more likely to book, what would it be?</div>
+                    <div class="form-group">
+                        <textarea name="q15" placeholder="Share your biggest frustration or wish..."></textarea>
+                    </div>
+                </div>
+
+                <!-- DEMOGRAPHICS -->
+                <div class="form-page">
+                    <div class="section-number">SECTION 12 OF 12</div>
+                    <p class="subtitle">About you</p>
+                    <div class="question-text">How often do you go camping or on group retreats?</div>
+                    <div class="form-group">
+                        <label><input type="radio" name="q16" value="Monthly"> Monthly or more</label>
+                        <label><input type="radio" name="q16" value="Quarterly"> 2-4 times a year</label>
+                        <label><input type="radio" name="q16" value="Annually"> Once a year</label>
+                        <label><input type="radio" name="q16" value="Rarely"> Rarely (once every few years)</label>
+                    </div>
+                </div>
+
+                <!-- THANK YOU -->
+                <div class="form-page">
+                    <div class="thank-you">
+                        <div class="success-icon">✓</div>
+                        <h2>Thank You!</h2>
+                        <p>Your responses have been recorded.</p>
+                        <p style="margin-bottom: 20px;">Your feedback will help us create better camping experiences.</p>
+                        <div class="note">
+                            <strong>Next Steps:</strong> We'll analyze all responses and use insights to improve the Whispering Pines website experience.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NAVIGATION -->
+                <div class="button-group">
+                    <button type="button" class="btn-prev" id="prevBtn" onclick="previousPage()" style="margin-top: 30px;">← Previous</button>
+                    <button type="button" class="btn-next" id="nextBtn" onclick="nextPage()" style="margin-top: 30px;">Next →</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 13; // Including intro, 11 sections, thank you
+
+        function showPage(n) {
+            const pages = document.querySelectorAll('.form-page');
+            
+            if (n >= totalPages) {
+                n = totalPages - 1;
+            }
+            if (n < 0) {
+                n = 0;
+            }
+
+            pages.forEach(page => page.classList.remove('active'));
+            pages[n].classList.add('active');
+
+            currentPage = n;
+            updateProgress();
+            updateButtons();
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                showPage(currentPage + 1);
+                window.scrollTo(0, 0);
+            } else {
+                submitForm();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                showPage(currentPage - 1);
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentPage) / (totalPages - 1)) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentPage').textContent = Math.max(1, currentPage);
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const isFirstPage = currentPage === 0;
+            const isLastPage = currentPage === totalPages - 1;
+
+            prevBtn.disabled = isFirstPage;
+            prevBtn.style.display = isFirstPage ? 'none' : 'block';
+
+            if (isLastPage) {
+                nextBtn.textContent = 'Close';
+                nextBtn.onclick = () => window.close();
+            } else {
+                nextBtn.textContent = 'Next →';
+                nextBtn.onclick = nextPage;
+            }
+        }
+
+        // ── Google Sheets integration ─────────────────────────────────────────
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz1E02znyeRgppmcuEdcNRn95gRsM_DZN_cSHynWur2ZoZru6RPMSfNmv08s0feoLoYfw/exec';
+        // ── Column definitions (order = Excel column order) ──────────────────
+        const QUESTIONS = [
+            { key: 'timestamp',  label: 'Timestamp' },
+            { key: 'q1',  label: 'Time on first website before deciding' },
+            { key: 'q2',  label: 'Reasons for leaving without booking' },
+            { key: 'q3',  label: 'First three things checked on a site' },
+            { key: 'q4',  label: 'Facilities that matter most' },
+            { key: 'q5',  label: 'Hesitant due to poor photos/descriptions?' },
+            { key: 'q6',  label: 'Info that builds confidence for families' },
+            { key: 'q7',  label: 'Importance of age-group activities' },
+            { key: 'q8',  label: 'What makes the price feel worth it' },
+            { key: 'q9',  label: 'Did unclear pricing make you leave?' },
+            { key: 'q10', label: 'Booking flexibility that matters most' },
+            { key: 'q11', label: 'Importance of food information' },
+            { key: 'q12', label: 'Location details that matter most' },
+            { key: 'q13', label: 'When do you typically book camping trips?' },
+            { key: 'q14', label: 'Do family reviews influence your decision?' },
+            { key: 'q15', label: 'One change to make you more likely to book' },
+            { key: 'q16', label: 'How often do you go camping / group retreats?' },
+        ];
+
+        function collectResponses() {
+            const form = document.getElementById('researchForm');
+            const checkboxNames = ['q2','q3','q4','q6','q8','q10','q12'];
+            const row = { timestamp: new Date().toISOString() };
+
+            // Radio buttons & textarea
+            const formData = new FormData(form);
+            for (const [name, value] of formData.entries()) {
+                if (!checkboxNames.includes(name)) row[name] = value;
+            }
+
+            // Checkboxes – collect ALL checked values and join with " | "
+            checkboxNames.forEach(name => {
+                const checked = [...form.querySelectorAll(`input[name="${name}"]:checked`)]
+                                  .map(el => el.value);
+                row[name] = checked.join(' | ');
+            });
+
+            return row;
+        }
+
+        function saveToStorage(row) {
+            const stored = JSON.parse(localStorage.getItem('wpResponses') || '[]');
+            stored.push(row);
+            localStorage.setItem('wpResponses', JSON.stringify(stored));
+            return stored.length;
+        }
+
+        function downloadCSV() {
+            const stored = JSON.parse(localStorage.getItem('wpResponses') || '[]');
+            if (stored.length === 0) { alert('No responses saved yet.'); return; }
+
+            const headers = QUESTIONS.map(q => q.label);
+            const rows = stored.map(row =>
+                QUESTIONS.map(q => {
+                    const val = (row[q.key] || '').toString().replace(/"/g, '""');
+                    return `"${val}"`;
+                }).join(',')
+            );
+
+            const csv = [headers.join(','), ...rows].join('\r\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = `WhisperingPines_Responses_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function submitForm() {
+            const checkboxNames = ['q2','q3','q4','q6','q8','q10','q12'];
+            const form     = document.getElementById('researchForm');
+            const formData = new FormData(form);
+            const row      = { timestamp: new Date().toISOString() };
+
+            // Radios & textarea
+            for (const [name, value] of formData.entries()) {
+                if (!checkboxNames.includes(name)) row[name] = value;
+            }
+
+            // Checkboxes — join multiple selections with " | "
+            checkboxNames.forEach(name => {
+                row[name] = [...form.querySelectorAll(`input[name="${name}"]:checked`)]
+                              .map(el => el.value).join(' | ');
+            });
+
+            // Send to Google Sheets
+            fetch(SHEET_URL, {
+                method: 'POST',
+                mode:   'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(row)
+            });
+
+            // Show thank you page immediately
+            showPage(totalPages - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') previousPage();
+        });
+
+        // Initialize
+        showPage(0);
+    </script>
+</body>
+</html>
