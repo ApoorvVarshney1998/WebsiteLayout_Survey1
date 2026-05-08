@@ -299,7 +299,7 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-text"><span id="currentPage">1</span> of <span id="totalPages">12</span></div>
+            <div class="progress-text"><span id="currentPage">1</span> of <span id="totalPages">16</span></div>
         </div>
 
         <form id="researchForm">
@@ -561,7 +561,7 @@
 
     <script>
         let currentPage = 0;
-        const totalPages = 13; // Including intro, 11 sections, thank you
+        const totalPages = 17; // 1 intro + 15 questions + 1 thank you
 
         function showPage(n) {
             const pages = document.querySelectorAll('.form-page');
@@ -607,120 +607,51 @@
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const isFirstPage = currentPage === 0;
-            const isLastPage = currentPage === totalPages - 1;
+            const isLastQuestion = currentPage === totalPages - 2; // One page before thank you
+            const isThankyouPage = currentPage === totalPages - 1;
 
             prevBtn.disabled = isFirstPage;
             prevBtn.style.display = isFirstPage ? 'none' : 'block';
 
-            if (isLastPage) {
+            if (isThankyouPage) {
                 nextBtn.textContent = 'Close';
                 nextBtn.onclick = () => window.close();
+                nextBtn.style.display = 'block';
+            } else if (isLastQuestion) {
+                nextBtn.textContent = '✓ Submit';
+                nextBtn.className = 'btn-next btn-submit';
+                nextBtn.onclick = submitForm;
             } else {
                 nextBtn.textContent = 'Next →';
+                nextBtn.className = 'btn-next';
                 nextBtn.onclick = nextPage;
             }
         }
 
-        // ── Google Sheets integration ─────────────────────────────────────────
-        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz1E02znyeRgppmcuEdcNRn95gRsM_DZN_cSHynWur2ZoZru6RPMSfNmv08s0feoLoYfw/exec';
-        // ── Column definitions (order = Excel column order) ──────────────────
-        const QUESTIONS = [
-            { key: 'timestamp',  label: 'Timestamp' },
-            { key: 'q1',  label: 'Time on first website before deciding' },
-            { key: 'q2',  label: 'Reasons for leaving without booking' },
-            { key: 'q3',  label: 'First three things checked on a site' },
-            { key: 'q4',  label: 'Facilities that matter most' },
-            { key: 'q5',  label: 'Hesitant due to poor photos/descriptions?' },
-            { key: 'q6',  label: 'Info that builds confidence for families' },
-            { key: 'q7',  label: 'Importance of age-group activities' },
-            { key: 'q8',  label: 'What makes the price feel worth it' },
-            { key: 'q9',  label: 'Did unclear pricing make you leave?' },
-            { key: 'q10', label: 'Booking flexibility that matters most' },
-            { key: 'q11', label: 'Importance of food information' },
-            { key: 'q12', label: 'Location details that matter most' },
-            { key: 'q13', label: 'When do you typically book camping trips?' },
-            { key: 'q14', label: 'Do family reviews influence your decision?' },
-            { key: 'q15', label: 'One change to make you more likely to book' },
-            { key: 'q16', label: 'How often do you go camping / group retreats?' },
-        ];
-
-        function collectResponses() {
-            const form = document.getElementById('researchForm');
-            const checkboxNames = ['q2','q3','q4','q6','q8','q10','q12'];
-            const row = { timestamp: new Date().toISOString() };
-
-            // Radio buttons & textarea
-            const formData = new FormData(form);
-            for (const [name, value] of formData.entries()) {
-                if (!checkboxNames.includes(name)) row[name] = value;
-            }
-
-            // Checkboxes – collect ALL checked values and join with " | "
-            checkboxNames.forEach(name => {
-                const checked = [...form.querySelectorAll(`input[name="${name}"]:checked`)]
-                                  .map(el => el.value);
-                row[name] = checked.join(' | ');
-            });
-
-            return row;
-        }
-
-        function saveToStorage(row) {
-            const stored = JSON.parse(localStorage.getItem('wpResponses') || '[]');
-            stored.push(row);
-            localStorage.setItem('wpResponses', JSON.stringify(stored));
-            return stored.length;
-        }
-
-        function downloadCSV() {
-            const stored = JSON.parse(localStorage.getItem('wpResponses') || '[]');
-            if (stored.length === 0) { alert('No responses saved yet.'); return; }
-
-            const headers = QUESTIONS.map(q => q.label);
-            const rows = stored.map(row =>
-                QUESTIONS.map(q => {
-                    const val = (row[q.key] || '').toString().replace(/"/g, '""');
-                    return `"${val}"`;
-                }).join(',')
-            );
-
-            const csv = [headers.join(','), ...rows].join('\r\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url  = URL.createObjectURL(blob);
-            const a    = document.createElement('a');
-            a.href     = url;
-            a.download = `WhisperingPines_Responses_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
         function submitForm() {
-            const checkboxNames = ['q2','q3','q4','q6','q8','q10','q12'];
-            const form     = document.getElementById('researchForm');
-            const formData = new FormData(form);
-            const row      = { timestamp: new Date().toISOString() };
-
-            // Radios & textarea
-            for (const [name, value] of formData.entries()) {
-                if (!checkboxNames.includes(name)) row[name] = value;
-            }
-
-            // Checkboxes — join multiple selections with " | "
-            checkboxNames.forEach(name => {
-                row[name] = [...form.querySelectorAll(`input[name="${name}"]:checked`)]
-                              .map(el => el.value).join(' | ');
-            });
-
-            // Send to Google Sheets
-            fetch(SHEET_URL, {
+            const formData = new FormData(document.getElementById('researchForm'));
+            const data = Object.fromEntries(formData);
+            data.timestamp = new Date().toISOString();
+            
+            // Send to Google Sheets via Apps Script
+            const scriptURL = 'https://script.google.com/macros/d/YOUR_SCRIPT_ID_HERE/usercopy';
+            
+            fetch(scriptURL, {
                 method: 'POST',
-                mode:   'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify(row)
+                body: JSON.stringify(data),
+                mode: 'no-cors'
+            })
+            .then(() => {
+                console.log('Form submitted successfully!');
+            })
+            .catch(error => {
+                console.error('Submission error:', error);
+            })
+            .finally(() => {
+                // Always show thank you page, regardless of submission success
+                window.scrollTo(0, 0);
+                showPage(totalPages - 1);
             });
-
-            // Show thank you page immediately
-            showPage(totalPages - 1);
         }
 
         // Keyboard navigation
